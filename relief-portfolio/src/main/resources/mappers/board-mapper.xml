@@ -1,0 +1,906 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+ "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+ <mapper namespace="boardMapper">
+	<resultMap id="BoardResultSet" type="Board">
+		<id property="board_id" column="BOARD_ID"/>
+		<result property="account_id" column="ACCOUNT_ID"/>
+		<result property="category_id" column="CATEGORY_ID"/>
+		<result property="title" column="TITLE"/>
+		<result property="content" column="CONTENT"/>
+		<result property="create_date" column="CREATE_DATE"/>
+		<result property="modify_date" column="MODIFY_DATE"/>
+		<result property="count" column="COUNT"/>
+		<result property="status" column="STATUS"/>
+		<result property="product_status" column="PRODUCT_STATUS"/>
+		<result property="trade_status" column="TRADE_STATUS"/>
+		<result property="price" column="PRICE"/>
+		<result property="exchange_status" column="EXCHANGE_STATUS"/>
+		<result property="amount" column="AMOUNT"/>
+		<result property="pull_date" column="PULL_DATE"/>
+		<result property="price_status" column="PRICE_STATUS"/>
+		<result property="area" column="AREA"/>
+ 	</resultMap>
+ 	<resultMap type="Image" id="ImageResultSet">
+ 		<id property="iid" column="IMAGE_ID"/>
+ 		<result property="bid" column="BOARD_ID"/>
+ 		<result property="fileName" column="FILENAME"/>
+ 		<result property="renameFileName" column="RENAME_FILENAME"/>
+ 	</resultMap>
+ 	<resultMap type="Category" id="CategoryResultSet">
+ 		<id property="cid" column="CATEGORY_ID"/>
+ 		<result property="cname" column="C_NAME"/>
+ 		<result property="cid2" column="CATEGORY_ID2"/>
+ 		<result property="cgroup" column="C_GROUP"/>
+ 		<result property="cstatus" column="C_STATUS"/>
+ 	</resultMap>
+ 	<resultMap id="WishResultSet" type="Wish">
+		<id property="wid" column="WISH_ID"/>
+		<result property="boardId" column="BOARD_ID"/>
+		<result property="accountId" column="ACCOUNT_ID"/>
+	</resultMap>
+	<resultMap id="AccountResultSet" type="Account">
+		<id property="aid" column="ACCOUNT_ID"/>
+		<result property="pwd" column="PWD"/>
+		<result property="name" column="NAME"/>
+		<result property="phone" column="PHONE"/>
+		<result property="email" column="EMAIL"/>
+		<result property="address" column="ADDRESS"/>
+		<result property="status" column="STATUS"/>
+		<result property="mstatus" column="M_STATUS"/>
+		<result property="sanctions" column="SANCTIONS"/>
+		<result property="authKey" column="AUTHKEY"/>
+		<result property="createDate" column="CREATE_DATE"/>
+	</resultMap>
+	<resultMap id="NoticeResultSet" type="Notice2">
+		<id property="notice_id" column="NOTICE_ID"/>
+		<result property="account_id" column="ACCOUNT_ID"/>
+		<result property="title" column="TITLE"/>
+		<result property="ncontent" column="NCONTENT"/>
+		<result property="create_date" column="CREATE_DATE"/>
+		<result property="modify_date" column="MODIFY_DATE"/>
+		<result property="ncount" column="NCOUNT"/>
+		<result property="status" column="STATUS"/>
+		<result property="fileName" column="FILENAME"/>
+		<result property="rename_fileName" column="RENAME_FILENAME"/>
+		<result property="n_status" column="N_STATUS"/>
+		<result property="a_status" column="A_STATUS"/>
+	</resultMap>
+	<resultMap id="ReviewResultSet" type="Review">
+		<id property="review_id" column="REVIEW_ID"/>
+		<result property="t_history_id" column="T_HISTORY_ID"/>
+		<result property="title" column="TITLE"/>
+		<result property="content" column="CONTENT"/>
+		<result property="status" column="STATUS"/>
+		<result property="star" column="STAR"/>
+		<result property="create_date" column="CREATE_DATE"/>
+		<result property="modify_date" column="MODIFY_DATE"/>
+		<result property="seller_id" column="SELLER_ID"/>
+		<result property="consumer_id" column="CONSUMER_ID"/>
+	</resultMap>
+	<resultMap id="ReplyResultSet" type="Reply">
+		<id property="reply_id" column="REPLY_ID"/>
+		<result property="bid" column="BOARD_ID"/>
+		<result property="aid" column="ACCOUNT_ID"/>
+		<result property="title" column="TITLE"/>
+		<result property="create_date" column="CREATE_DATE"/>
+		<result property="modify_date" column="MODIFY_DATE"/>
+		<result property="status" column="STATUS"/>
+		<result property="reply_id2" column="REPLY_ID2"/>
+	</resultMap>
+	
+ 	<select id="selectbListCount" parameterType="SB" resultType="_int">
+ 		SELECT
+ 				COUNT(*)
+ 		  FROM
+ 		  		BOARD B
+         JOIN T_HISTORY USING(BOARD_ID)
+ 		 WHERE
+ 		 	   (B.TITLE LIKE '%'|| #{searchValue} || '%'
+ 		   OR B.CONTENT LIKE '%'|| #{searchValue} || '%'
+ 		   OR B.AREA LIKE '%'|| #{searchValue} || '%')
+ 		   AND B.AREA LIKE '%'|| #{address} || '%'
+ 		   AND B.STATUS = 'Y'
+           AND HIDE_STATUS = 'N'
+ 	</select>
+ 	<select id="selectbList" parameterType="SB" resultMap="BoardResultSet">
+ 		SELECT
+ 				BOARD_ID
+ 			  , B.ACCOUNT_ID
+ 			  , B.CATEGORY_ID
+ 			  , B.TITLE
+ 			  , B.CONTENT
+ 			  , B.CREATE_DATE
+ 			  , B.MODIFY_DATE
+ 			  , B.COUNT
+ 			  , B.STATUS
+ 			  , B.PRODUCT_STATUS
+ 			  , B.TRADE_STATUS
+ 			  , B.PRICE
+ 			  , B.EXCHANGE_STATUS
+ 			  , B.AMOUNT
+ 			  , B.PULL_DATE
+ 			  , B.PRICE_STATUS
+ 			  , B.AREA
+ 		  FROM
+ 		  		BOARD B
+ 		 JOIN T_HISTORY USING(BOARD_ID)
+ 		 WHERE
+ 		 	   (B.TITLE LIKE '%'|| #{searchValue} || '%'
+ 		   OR B.CONTENT LIKE '%'|| #{searchValue} || '%'
+ 		   OR B.AREA LIKE '%'|| #{searchValue} || '%')
+ 		   AND B.AREA LIKE '%'|| #{address} || '%'
+ 		   AND B.STATUS = 'Y'
+           AND HIDE_STATUS = 'N'
+ 	  ORDER BY B.PULL_DATE DESC
+ 	</select>
+ 	<select id="selectiList" parameterType="_int" resultMap="ImageResultSet">
+ 		SELECT
+ 				IMAGE_ID
+ 			  , BOARD_ID
+ 			  , FILENAME
+ 			  , RENAME_FILENAME
+ 		  FROM
+ 		  		IMAGE
+ 		  JOIN  T_HISTORY USING(BOARD_ID)
+ 		 WHERE
+ 		 		BOARD_ID = #{board_id}
+ 		 		AND HIDE_STATUS = 'N'
+                AND (IMAGE_ID,BOARD_ID) IN(SELECT MIN(IMAGE_ID), BOARD_ID
+                FROM IMAGE GROUP BY BOARD_ID)
+ 	</select>
+ 	<select id="selectdescbList" parameterType="SB" resultMap="BoardResultSet">
+ 		SELECT
+ 				BOARD_ID
+ 			  , B.ACCOUNT_ID
+ 			  , B.CATEGORY_ID
+ 			  , B.TITLE
+ 			  , B.CONTENT
+ 			  , B.CREATE_DATE
+ 			  , B.MODIFY_DATE
+ 			  , B.COUNT
+ 			  , B.STATUS
+ 			  , B.PRODUCT_STATUS
+ 			  , B.TRADE_STATUS
+ 			  , B.PRICE
+ 			  , B.EXCHANGE_STATUS
+ 			  , B.AMOUNT
+ 			  , B.PULL_DATE
+ 			  , B.PRICE_STATUS
+ 			  , B.AREA
+ 		  FROM
+ 		  		BOARD B
+ 		  JOIN T_HISTORY USING(BOARD_ID)
+ 		 WHERE
+ 		 	   (B.TITLE LIKE '%'|| #{searchValue} || '%'
+ 		   OR B.CONTENT LIKE '%' || #{searchValue} || '%'
+ 		   OR B.AREA LIKE '%' || #{searchValue} || '%')
+ 		   AND B.AREA LIKE '%' || #{address} || '%'
+ 		   AND B.STATUS = 'Y'
+ 		   AND HIDE_STATUS = 'N'
+ 		   ORDER BY B.PRICE DESC
+ 	</select>
+ 	<select id="selectascbList" parameterType="SB" resultMap="BoardResultSet">
+ 		SELECT
+ 				BOARD_ID
+ 			  , B.ACCOUNT_ID
+ 			  , B.CATEGORY_ID
+ 			  , B.TITLE
+ 			  , B.CONTENT
+ 			  , B.CREATE_DATE
+ 			  , B.MODIFY_DATE
+ 			  , B.COUNT
+ 			  , B.STATUS
+ 			  , B.PRODUCT_STATUS
+ 			  , B.TRADE_STATUS
+ 			  , B.PRICE
+ 			  , B.EXCHANGE_STATUS
+ 			  , B.AMOUNT
+ 			  , B.PULL_DATE
+ 			  , B.PRICE_STATUS
+ 			  , B.AREA
+ 		  FROM
+ 		  		BOARD B
+ 		  JOIN T_HISTORY USING(BOARD_ID)
+ 		 WHERE
+ 		 	   (B.TITLE LIKE '%'|| #{searchValue} || '%'
+ 		   OR B.CONTENT LIKE '%' || #{searchValue} || '%'
+ 		   OR B.AREA LIKE '%' || #{searchValue} || '%')
+ 		   AND B.AREA LIKE '%' || #{address} || '%'
+ 		   AND B.STATUS = 'Y'
+ 		   AND HIDE_STATUS = 'N'
+ 		   ORDER BY B.PRICE ASC
+ 	</select>
+ 	<select id="selectcList" resultMap="CategoryResultSet">
+ 		SELECT
+				CATEGORY_ID
+			  , C_NAME
+			  , CATEGORY_ID2
+			  , C_GROUP
+			  , C_STATUS
+		  FROM
+		  		CATEGORY
+		 WHERE
+		 		C_STATUS = 'Y'
+		  ORDER BY CATEGORY_ID DESC	
+ 	</select>
+ 	<select id="selectCategory1" parameterType="_int" resultMap="CategoryResultSet">
+ 		SELECT
+				CATEGORY_ID
+			  , C_NAME
+			  , CATEGORY_ID2
+			  , C_GROUP
+			  , C_STATUS
+		  FROM
+		  		CATEGORY
+		 WHERE
+		 		C_STATUS = 'Y'
+		   AND
+		   		CATEGORY_ID = #{cid}
+ 	</select>
+ 	<select id="selectcListFromCid2" parameterType="_int" resultMap="CategoryResultSet">
+ 		SELECT
+				CATEGORY_ID
+			  , C_NAME
+			  , CATEGORY_ID2
+			  , C_GROUP
+			  , C_STATUS
+		  FROM
+		  		CATEGORY
+		 WHERE
+		 		C_STATUS = 'Y'
+		   AND
+		   		CATEGORY_ID2 = #{cid}
+ 	</select>
+ 	<select id="selectcListFromiList" parameterType="list" resultMap="CategoryResultSet">
+ 		SELECT
+				CATEGORY_ID
+			  , C_NAME
+			  , CATEGORY_ID2
+			  , C_GROUP
+			  , C_STATUS
+		  FROM
+		  		CATEGORY
+		 WHERE
+		 		C_STATUS = 'Y'
+		   AND (CATEGORY_ID2 =
+		 		<foreach item="item" collection="list"
+   		   		separator="OR CATEGORY_ID2 =" close=")">#{item}</foreach>
+ 	</select>
+ 	<select id="selectbListFromCategoryCount" parameterType="CB" resultType="_int">
+ 		SELECT
+ 				COUNT(*)
+ 		  FROM
+ 		  		BOARD B
+ 		  JOIN T_HISTORY USING(BOARD_ID)
+ 		 WHERE
+ 		 		B.STATUS = 'Y'
+ 		   AND (B.CATEGORY_ID =
+ 		   		<foreach item="item" collection="list"
+   		   		separator="OR B.CATEGORY_ID =" close=")">#{item}</foreach>
+   		   AND B.AREA LIKE '%' || #{address} || '%'
+   		   AND HIDE_STATUS = 'N'
+ 		   AND B.STATUS = 'Y'
+ 	</select>
+ 	<select id="selectbListFromCategory" parameterType="CB" resultMap="BoardResultSet">
+ 		SELECT
+				BOARD_ID
+ 			  , B.ACCOUNT_ID
+ 			  , B.CATEGORY_ID
+ 			  , B.TITLE
+ 			  , B.CONTENT
+ 			  , B.CREATE_DATE
+ 			  , B.MODIFY_DATE
+ 			  , B.COUNT
+ 			  , B.STATUS
+ 			  , B.PRODUCT_STATUS
+ 			  , B.TRADE_STATUS
+ 			  , B.PRICE
+ 			  , B.EXCHANGE_STATUS
+ 			  , B.AMOUNT
+ 			  , B.PULL_DATE
+ 			  , B.PRICE_STATUS
+ 			  , B.AREA
+ 		  FROM
+ 		  		BOARD B
+ 		  JOIN T_HISTORY USING(BOARD_ID)
+ 		 WHERE
+ 		 		B.STATUS = 'Y'
+ 		   AND (B.CATEGORY_ID =
+ 		   		<foreach item="item" collection="list"
+   		   		separator="OR B.CATEGORY_ID =" close=")">#{item}</foreach>
+   		   AND B.AREA LIKE '%' || #{address} || '%'
+ 		   AND B.STATUS = 'Y'
+ 		   AND HIDE_STATUS = 'N'
+   	  ORDER BY B.PULL_DATE DESC
+	</select>
+	<select id="selectbListFromCategoryCount2" parameterType="CB" resultType="_int">
+		SELECT
+				COUNT(*)
+		  FROM
+		  		BOARD B
+		  JOIN T_HISTORY USING(BOARD_ID)
+		 WHERE
+		 		B.CATEGORY_ID = #{categoryValue}
+		   AND B.AREA LIKE '%' || #{address} || '%'
+		   AND HIDE_STATUS = 'N'
+ 		   AND B.STATUS = 'Y'
+	</select>
+	<select id="selectbListFromCategory2" parameterType="CB" resultMap="BoardResultSet">
+		SELECT
+ 				BOARD_ID
+ 			  , B.ACCOUNT_ID
+ 			  , B.CATEGORY_ID
+ 			  , B.TITLE
+ 			  , B.CONTENT
+ 			  , B.CREATE_DATE
+ 			  , B.MODIFY_DATE
+ 			  , B.COUNT
+ 			  , B.STATUS
+ 			  , B.PRODUCT_STATUS
+ 			  , B.TRADE_STATUS
+ 			  , B.PRICE
+ 			  , B.EXCHANGE_STATUS
+ 			  , B.AMOUNT
+ 			  , B.PULL_DATE
+ 			  , B.PRICE_STATUS
+ 			  , B.AREA
+ 		  FROM
+ 		  		BOARD B
+ 		  JOIN T_HISTORY USING(BOARD_ID)
+		  WHERE
+		 		B.CATEGORY_ID = #{categoryValue}
+		   AND B.AREA LIKE '%' || #{address} || '%'
+ 		   AND B.STATUS = 'Y'
+ 		   AND HIDE_STATUS = 'N'
+	   ORDER BY B.PULL_DATE DESC	
+	</select>
+	<select id="selectTodayList" resultMap="BoardResultSet">
+	  SELECT *
+      FROM (SELECT *
+              FROM
+                 BOARD
+              WHERE
+                 STATUS = 'Y'
+              ORDER BY
+                 CREATE_DATE DESC, BOARD_ID DESC
+              )
+      JOIN
+      (SELECT IMAGE_ID, BOARD_ID, FILENAME, RENAME_FILENAME
+      FROM IMAGE
+      WHERE IMAGE_ID IN (SELECT MIN(IMAGE_ID)
+                         FROM IMAGE
+                         GROUP BY BOARD_ID)) IMG USING(BOARD_ID)
+      JOIN T_HISTORY USING (BOARD_ID)
+      WHERE
+         HIDE_STATUS = 'N'
+         AND
+            ROWNUM <![CDATA[<=]]> 20
+         ORDER BY CREATE_DATE DESC
+	</select>
+	
+	<update id="updateReadCount" parameterType="_int">
+		UPDATE
+			BOARD
+		SET
+			COUNT = COUNT + 1
+		WHERE
+			BOARD_ID = #{board_id}
+	</update>
+	
+	<select id="selectBoard" parameterType="_int" resultMap="BoardResultSet">
+		SELECT BOARD_ID
+ 			  , B.ACCOUNT_ID
+ 			  , B.CATEGORY_ID
+ 			  , B.TITLE
+ 			  , B.CONTENT
+ 			  , B.CREATE_DATE
+ 			  , B.MODIFY_DATE
+ 			  , B.COUNT
+ 			  , B.STATUS
+ 			  , B.PRODUCT_STATUS
+ 			  , B.TRADE_STATUS
+ 			  , B.PRICE
+ 			  , B.EXCHANGE_STATUS
+ 			  , B.AMOUNT
+ 			  , B.PULL_DATE
+ 			  , B.PRICE_STATUS
+ 			  , B.AREA
+		FROM
+			BOARD B
+        JOIN T_HISTORY USING(BOARD_ID)
+		WHERE
+            BOARD_ID = #{board_id}
+        AND B.STATUS = 'Y'
+        AND HIDE_STATUS = 'N'
+	</select>
+	
+	<select id="selectImage" parameterType="_int" resultMap="ImageResultSet">
+       SELECT
+             IMAGE_ID
+            , BOARD_ID
+            , FILENAME
+            , RENAME_FILENAME
+         FROM
+               IMAGE
+         JOIN T_HISTORY USING(BOARD_ID)
+        WHERE
+              BOARD_ID = #{board_id}
+              	AND HIDE_STATUS = 'N'
+                AND (IMAGE_ID,BOARD_ID) IN(SELECT MIN(IMAGE_ID), BOARD_ID
+                FROM IMAGE GROUP BY BOARD_ID)
+    </select>
+    
+    <select id="selectImageList" parameterType="_int" resultMap="ImageResultSet">
+    	SELECT 
+    		  IMAGE_ID
+            , BOARD_ID
+            , FILENAME
+            , RENAME_FILENAME
+		FROM IMAGE
+		JOIN T_HISTORY USING(BOARD_ID)
+		WHERE BOARD_ID = #{board_id}
+		  AND HIDE_STATUS = 'N'
+		ORDER BY	
+			IMAGE_ID ASC
+    </select>
+	
+<!-- 	<select id="searchList" parameterType="Search" resultMap="boardResultSet">
+	<bind name="sv" value="'%' + _parameter.getSearchValue() + '%'"/>
+		SELECT *
+		FROM
+			BOARD
+		WHERE
+			TITLE LIKE #{sv}
+		 OR CONTENT LIKE #{sv}
+		 OR AREA LIKE #{sv}
+		ORDER BY
+			NID DESC
+	</select> -->
+	 	<insert id="insertWish" parameterType="Wish">
+ 		INSERT
+ 		INTO WISH
+ 		(
+ 			WISH_ID
+ 		  , BOARD_ID
+ 		  , ACCOUNT_ID
+ 		)
+ 		VALUES
+ 		(
+ 			SEQ_WID.NEXTVAL
+ 		  , #{boardId}
+ 		  , #{accountId}
+ 		)
+ 	</insert>
+ 	
+ 	<select id="selectWish" parameterType="Wish" resultMap="WishResultSet">
+ 		SELECT
+ 			*
+ 		FROM WISH
+ 		WHERE
+ 			BOARD_ID = #{boardId}
+ 		AND ACCOUNT_ID = #{accountId}
+ 	</select>
+ 	
+ 	<select id="wishCount" parameterType="string" resultType="_int">
+ 		SELECT 
+ 			COUNT(*)
+		FROM 
+			WISH
+		WHERE 
+			ACCOUNT_ID = #{aid}
+ 	</select>
+ 	<select id="selectCategory" resultMap="CategoryResultSet">
+ 		 SELECT
+				CATEGORY_ID
+			  , C_NAME
+			  , CATEGORY_ID2
+			  , C_GROUP
+			  , C_STATUS
+		  FROM
+		  		CATEGORY
+		 WHERE
+		 		C_STATUS = 'Y'
+		   AND
+		   		C_GROUP = 1
+ 	</select>
+ 	<select id="selectCategory2" parameterType="_int" resultMap="CategoryResultSet">
+ 		 SELECT
+				CATEGORY_ID
+			  , C_NAME
+			  , CATEGORY_ID2
+			  , C_GROUP
+			  , C_STATUS
+		  FROM
+		  		CATEGORY
+		 WHERE
+		 		C_STATUS = 'Y'
+		   AND
+		   		CATEGORY_ID2 = #{cid}
+ 	</select>
+ 	<insert id="insertBoard" parameterType="Board">
+		INSERT
+		INTO
+			 BOARD
+				  (
+					  BOARD_ID
+					, ACCOUNT_ID
+					, CATEGORY_ID
+					, TITLE
+					, CONTENT
+					, CREATE_DATE
+					, MODIFY_DATE
+					, COUNT
+					, STATUS
+					, PRODUCT_STATUS
+					, TRADE_STATUS
+					, PRICE
+					, EXCHANGE_STATUS
+					, AMOUNT
+					, PULL_DATE
+					, PRICE_STATUS
+					, AREA
+				   )
+			VALUES
+					(
+					  SEQ_BID.NEXTVAL
+					, #{account_id}
+					, #{category_id}
+					, #{title}
+					, #{content}
+					, SYSDATE
+					, SYSDATE
+					, 0
+					, 'Y'
+					, '새상품'
+					, 'Y'
+					, #{price}
+					, 'Y'
+					, #{amount}
+					, SYSDATE
+					, #{price_status}
+					, #{area}
+					)
+ 	</insert>
+ 	<insert id="insertImage" parameterType="BoardImage">
+ 		INSERT
+		INTO
+			 IMAGE
+				 (
+				   IMAGE_ID
+				 , BOARD_ID
+				 , FILENAME
+				 , RENAME_FILENAME
+				 )
+				 VALUES
+				 (
+			 	  SEQ_IID.NEXTVAL
+			 	, #{bid}
+			 	, #{list}
+			 	, #{list}
+				 )
+ 	</insert>
+ 	<select id="selectbId" resultType="_int">
+		SELECT 
+			  SEQ_BID.CURRVAL
+		 FROM 
+		 	  DUAL
+ 	</select>
+ 	<insert id="reportUser" parameterType="Report">
+ 		INSERT
+ 		INTO
+ 			 REPORT
+ 			 	   (
+ 			 	   	REPORT_ID
+				  , CHAT_ID
+				  , BOARD_ID
+				  , REPLY_ID
+				  , REPORT_REASON
+				  , ACCOUNT_ID
+				  , ACCOUNT_ID2
+				  , REPORT_DATE
+ 			 	   )
+ 			 VALUES
+ 			 	  (
+ 			 	   SEQ_RPID.NEXTVAL
+ 			 	 , NULL
+ 			 	 , #{bid}
+ 			 	 , NULL
+ 			 	 , #{reportReason}
+ 			 	 , #{aid}
+ 			 	 , #{aid2}
+ 			 	 , SYSDATE
+ 			 	  )
+ 	</insert>
+ 	 	<insert id="reportUser2" parameterType="Report">
+ 		INSERT
+ 		INTO
+ 			 REPORT
+ 			 	   (
+ 			 	   	REPORT_ID
+				  , CHAT_ID
+				  , BOARD_ID
+				  , REPLY_ID
+				  , REPORT_REASON
+				  , ACCOUNT_ID
+				  , ACCOUNT_ID2
+				  , REPORT_DATE
+ 			 	   )
+ 			 VALUES
+ 			 	  (
+ 			 	   SEQ_RPID.NEXTVAL
+ 			 	 , #{chid}
+ 			 	 , NULL
+ 			 	 , NULL
+ 			 	 , #{reportReason}
+ 			 	 , #{aid}
+ 			 	 , #{aid2}
+ 			 	 , SYSDATE
+ 			 	  )
+ 	</insert>
+ 	 	<insert id="reportUser3" parameterType="Report">
+ 		INSERT
+ 		INTO
+ 			 REPORT
+ 			 	   (
+ 			 	   	REPORT_ID
+				  , CHAT_ID
+				  , BOARD_ID
+				  , REPLY_ID
+				  , REPORT_REASON
+				  , ACCOUNT_ID
+				  , ACCOUNT_ID2
+				  , REPORT_DATE
+ 			 	   )
+ 			 VALUES
+ 			 	  (
+ 			 	   SEQ_RPID.NEXTVAL
+ 			 	 , NULL
+ 			 	 , NULL
+ 			 	 , #{rid}
+ 			 	 , #{reportReason}
+ 			 	 , #{aid}
+ 			 	 , #{aid2}
+ 			 	 , SYSDATE
+ 			 	  )
+ 	</insert>
+ 	
+ 	<select id="selectadList" resultMap="NoticeResultSet">
+ 		SELECT
+ 			*
+ 		FROM NOTICE
+ 		WHERE
+ 			STATUS = 'Y'
+ 		AND A_STATUS = 'Y'
+ 	</select>
+ 	
+ 	<select id="selectrList" parameterType="string" resultMap="ReviewResultSet">
+ 		SELECT *
+		FROM
+			(SELECT REVIEW_ID
+		   		  , R.T_HISTORY_ID
+		   		  , TITLE
+		   		  , CONTENT
+		   		  , R.STATUS
+		   		  , STAR
+		   		  , CREATE_DATE
+		   		  , MODIFY_DATE
+		   		  , CONSUMER_ID
+		   		  , SELLER_ID
+			FROM REVIEW R
+			JOIN T_HISTORY T ON (R.T_HISTORY_ID = T.T_HISTORY_ID)
+			WHERE 
+				SELLER_ID = #{account_id}
+			ORDER BY 
+				CREATE_DATE DESC)
+		WHERE ROWNUM <![CDATA[<=]]> 3
+ 	</select>
+ 	
+<!--  	<select id="selectReplyList" parameterType="_int" resultMap="ReplyResultSet">
+ 		SELECT
+			REPLY_ID
+		  , BOARD_ID
+		  , ACCOUNT_ID
+		  , TITLE
+		  , CREATE_DATE
+		  , MODIFY_DATE
+		  , STATUS
+		  , REPLY_ID2
+		FROM
+			REPLY
+		WHERE
+			BOARD_ID = #{bid}
+		AND STATUS = 'Y'
+		ORDER BY
+			REPLY_ID DESC
+ 	</select> -->
+ 	
+ 	<select id="selectReplyList" parameterType="_int" resultMap="ReplyResultSet">
+		 SELECT REPLY_ID
+	      , BOARD_ID
+	      , ACCOUNT_ID
+	      , CREATE_DATE
+	      , MODIFY_DATE
+	      , STATUS
+	      , LEVEL REPLY_ID2
+	      , CASE WHEN LEVEL = 1 THEN '' ELSE LPAD('└  ',LEVEL*2,' ') END ||
+	        CASE WHEN STATUS ='N' THEN '***삭제된 댓글입니다***' ELSE TITLE END TITLE
+		FROM (SELECT *
+		      FROM REPLY
+		      WHERE BOARD_ID = #{bid}
+		      )
+		START WITH REPLY_ID2 = 0
+		CONNECT BY PRIOR REPLY_ID = REPLY_ID2
+		ORDER SIBLINGS BY CREATE_DATE DESC
+ 	</select>
+ 	
+ 	<insert id="insertReply" parameterType="Reply">
+		INSERT
+			INTO
+		REPLY
+		(
+			REPLY_ID
+		  , BOARD_ID
+		  , ACCOUNT_ID
+		  , TITLE
+		  , CREATE_DATE
+		  , MODIFY_DATE
+		  , STATUS
+		  , REPLY_ID2
+		)
+		VALUES
+		(
+			SEQ_CMID.NEXTVAL
+		  , #{bid}
+		  , #{aid}
+		  , #{title}
+		  , SYSDATE
+		  , SYSDATE
+		  , DEFAULT
+		  , #{reply_id2}
+		)
+	</insert>
+	
+	<insert id="insertReply2" parameterType="Reply">
+		INSERT
+			INTO
+		REPLY
+		(
+			REPLY_ID
+		  , BOARD_ID
+		  , ACCOUNT_ID
+		  , TITLE
+		  , CREATE_DATE
+		  , MODIFY_DATE
+		  , STATUS
+		  , REPLY_ID2
+		)
+		VALUES
+		(
+			SEQ_CMID.NEXTVAL
+		  , #{bid}
+		  , #{aid}
+		  , #{title}
+		  , SYSDATE
+		  , SYSDATE
+		  , DEFAULT
+		  , #{reply_id2}
+		)
+	</insert>
+	
+	<select id="selectReply2List" parameterType="_int" resultMap="ReplyResultSet">
+ 		SELECT
+		    ACCOUNT_ID
+		  , TITLE
+		  , CREATE_DATE
+		FROM
+			REPLY
+		WHERE
+			REPLY_ID2 = #{ reply_id }
+		AND STATUS = 'Y'
+		ORDER BY
+			REPLY_ID DESC
+ 	</select>
+	<select id="nLoginListCount" parameterType="string" resultType="_int">
+		SELECT
+ 				COUNT(*)
+ 		  FROM
+ 		  		BOARD B
+ 		  JOIN T_HISTORY USING(BOARD_ID)
+ 		 WHERE
+ 		 	   (B.TITLE LIKE '%'|| #{searchValue} || '%'
+ 		   OR B.CONTENT LIKE '%' || #{searchValue} || '%'
+ 		   OR B.AREA LIKE '%' || #{searchValue} || '%')
+ 		  AND B.STATUS = 'Y'
+ 		  AND HIDE_STATUS = 'N'
+ 	  ORDER BY B.PULL_DATE DESC
+	</select>
+	<select id="nLoginList" parameterType="string" resultMap="BoardResultSet">
+		SELECT
+				BOARD_ID
+ 			  , B.ACCOUNT_ID
+ 			  , B.CATEGORY_ID
+ 			  , B.TITLE
+ 			  , B.CONTENT
+ 			  , B.CREATE_DATE
+ 			  , B.MODIFY_DATE
+ 			  , B.COUNT
+ 			  , B.STATUS
+ 			  , B.PRODUCT_STATUS
+ 			  , B.TRADE_STATUS
+ 			  , B.PRICE
+ 			  , B.EXCHANGE_STATUS
+ 			  , B.AMOUNT
+ 			  , B.PULL_DATE
+ 			  , B.PRICE_STATUS
+ 			  , B.AREA
+ 		  FROM
+ 		  		BOARD B
+ 		  JOIN T_HISTORY USING(BOARD_ID)
+ 		  WHERE
+ 		 	   (B.TITLE LIKE '%'|| #{searchValue} || '%'
+ 		   OR B.CONTENT LIKE '%' || #{searchValue} || '%'
+ 		   OR B.AREA LIKE '%' || #{searchValue} || '%')
+ 		  AND B.STATUS = 'Y'
+ 		  AND HIDE_STATUS = 'N'
+ 	  ORDER BY B.PULL_DATE DESC
+	</select>
+	<insert id="insertThistory" parameterType="Board">
+		INSERT
+		  INTO T_HISTORY
+		VALUES
+		(
+			SEQ_TID.NEXTVAL
+		  , #{board_id}
+		  , SYSDATE
+		  , DEFAULT
+		  , #{account_id}
+		  , 'A'
+		  , DEFAULT
+		  , DEFAULT
+		)
+	</insert>
+	<insert id="insertImage2" parameterType="BoardImage">
+		INSERT
+		INTO
+			 IMAGE
+				 (
+				   IMAGE_ID
+				 , BOARD_ID
+				 , FILENAME
+				 , RENAME_FILENAME
+				 , FILE_LEVEL
+				 )
+				 VALUES
+				 (
+			 	  SEQ_IID.NEXTVAL
+			 	, #{bid}
+			 	, #{list}
+			 	, #{list}
+			 	, 0
+				 )
+ 	</insert>
+ 	<delete id="deleteImage" parameterType="_int">
+ 		DELETE
+ 		  FROM IMAGE
+ 		 WHERE
+ 		 	   IMAGE_ID = #{iid}
+ 	</delete>
+ 	<update id="updateBoard">
+ 		UPDATE
+ 				BOARD
+ 		   SET
+ 		   		CATEGORY_ID = #{category_id}
+ 		   	  , TITLE = #{title}
+ 		   	  , CONTENT = #{content}
+ 		   	  , MODIFY_DATE = SYSDATE
+ 		   	  , PRODUCT_STATUS = #{product_status}
+ 		   	  , PRICE = #{price}
+ 		   	  , EXCHANGE_STATUS = #{exchange_status}
+ 		   	  , AMOUNT = #{amount}
+ 		   	  , PRICE_STATUS = #{price_status}
+ 	 	  WHERE
+ 	 	  		BOARD_ID = #{board_id} 
+ 	</update>
+ </mapper>
